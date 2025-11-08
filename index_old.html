@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D STL Measurement Tool</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #1a1a2e;
+            color: white;
+            overflow: hidden;
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        #header {
+            background: #2d2d44;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        #controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        button, .file-label {
+            background: #4a4a6a;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s;
+        }
+
+        button:hover, .file-label:hover {
+            background: #5a5a7a;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .file-label {
+            background: #2563eb;
+        }
+
+        .file-label:hover {
+            background: #1d4ed8;
+        }
+
+        button.active {
+            background: #16a34a;
+        }
+
+        button.clear {
+            background: #dc2626;
+        }
+
+        button.clear:hover {
+            background: #b91c1c;
+        }
+
+        #unitSelect {
+            background: #4a4a6a;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        #info {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 8px;
+        }
+
+        #status {
+            font-size: 12px;
+            color: #fbbf24;
+            margin-top: 5px;
+        }
+
+        #main {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        #canvasContainer {
+            flex: 1;
+            position: relative;
+        }
+
+        #canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        #placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+            pointer-events: none;
+        }
+
+        #placeholder svg {
+            width: 64px;
+            height: 64px;
+            opacity: 0.5;
+            margin-bottom: 20px;
+        }
+
+        #sidebar {
+            width: 320px;
+            background: #2d2d44;
+            padding: 20px;
+            overflow-y: auto;
+            border-left: 1px solid #4a4a6a;
+        }
+
+        #sidebar h2 {
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .measurement {
+            background: #3d3d5c;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .measurement-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .measurement-type {
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .measurement-value {
+            font-size: 20px;
+            color: #60a5fa;
+        }
+
+        .measurement-points {
+            font-size: 11px;
+            color: #9ca3af;
+        }
+
+        .no-measurements {
+            color: #6b7280;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="header">
+            <h1>3D STL Measurement Tool</h1>
+            <div id="controls">
+                <label class="file-label">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                    </svg>
+                    Load STL
+                    <input type="file" id="fileInput" accept=".stl">
+                </label>
+                <button id="distanceBtn" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                    </svg>
+                    Measure Distance
+                </button>
+                <button id="angleBtn" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                    </svg>
+                    Measure Angle
+                </button>
+                <button id="clearBtn" class="clear" disabled>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"/>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                    </svg>
+                    Clear All
+                </button>
+                <select id="unitSelect">
+                    <option value="mm">mm</option>
+                    <option value="cm">cm</option>
+                    <option value="m">m</option>
+                    <option value="in">inches</option>
+                </select>
+            </div>
+            <div id="info"></div>
+            <div id="status"></div>
+        </div>
+
+        <div id="main">
+            <div id="canvasContainer">
+                <canvas id="canvas"></canvas>
+                <div id="placeholder">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                    </svg>
+                    <p style="font-size: 20px; margin-bottom: 10px;">Upload an STL file to begin</p>
+                    <p style="font-size: 14px;">Drag to rotate • Scroll to zoom</p>
+                </div>
+            </div>
+
+            <div id="sidebar">
+                <h2>Measurements</h2>
+                <div id="measurements">
+                    <p class="no-measurements">No measurements yet</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let scene, camera, renderer, model;
+        let raycaster, mouse;
+        let measurementMode = null;
+        let selectedPoints = [];
+        let pointMarkers = [];
+        let measurements = [];
+        let rotation = { x: 0, y: 0 };
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        let currentUnit = 'mm';
+
+        const canvas = document.getElementById('canvas');
+        const fileInput = document.getElementById('fileInput');
+        const distanceBtn = document.getElementById('distanceBtn');
+        const angleBtn = document.getElementById('angleBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const unitSelect = document.getElementById('unitSelect');
+        const infoDiv = document.getElementById('info');
+        const statusDiv = document.getElementById('status');
+        const measurementsDiv = document.getElementById('measurements');
+        const placeholder = document.getElementById('placeholder');
+
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a1a2e);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(
+                75,
+                canvas.clientWidth / canvas.clientHeight,
+                0.1,
+                1000
+            );
+            camera.position.set(0, 0, 100);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight1.position.set(1, 1, 1);
+            scene.add(directionalLight1);
+
+            const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.4);
+            directionalLight2.position.set(-1, -1, -1);
+            scene.add(directionalLight2);
+
+            // Grid
+            const gridHelper = new THREE.GridHelper(200, 20, 0x444444, 0x222222);
+            scene.add(gridHelper);
+
+            // Raycaster
+            raycaster = new THREE.Raycaster();
+            mouse = new THREE.Vector2();
+
+            // Event listeners
+            fileInput.addEventListener('change', handleFileUpload);
+            distanceBtn.addEventListener('click', () => toggleMeasurementMode('distance'));
+            angleBtn.addEventListener('click', () => toggleMeasurementMode('angle'));
+            clearBtn.addEventListener('click', clearMeasurements);
+            unitSelect.addEventListener('change', handleUnitChange);
+            canvas.addEventListener('click', handleCanvasClick);
+            canvas.addEventListener('mousedown', handleMouseDown);
+            canvas.addEventListener('mousemove', handleMouseMove);
+            canvas.addEventListener('mouseup', handleMouseUp);
+            canvas.addEventListener('wheel', handleWheel);
+            window.addEventListener('resize', handleResize);
+
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                loadSTL(e.target.result);
+                placeholder.style.display = 'none';
+                infoDiv.textContent = `Loaded: ${file.name}`;
+                distanceBtn.disabled = false;
+                angleBtn.disabled = false;
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function loadSTL(arrayBuffer) {
+            if (model) {
+                scene.remove(model);
+            }
+
+            const geometry = parseSTL(arrayBuffer);
+            geometry.computeVertexNormals();
+            geometry.center();
+
+            const material = new THREE.MeshPhongMaterial({
+                color: 0x00d4ff,
+                specular: 0x111111,
+                shininess: 200
+            });
+
+            model = new THREE.Mesh(geometry, material);
+            scene.add(model);
+
+            const box = new THREE.Box3().setFromObject(model);
+            const size = box.getSize(new THREE.Vector3());
+            const maxDim = Math.max(size.x, size.y, size.z);
+            camera.position.z = maxDim * 2;
+        }
+
+        function parseSTL(arrayBuffer) {
+            const view = new DataView(arrayBuffer);
+            const isASCII = arrayBuffer.byteLength > 5 && 
+                String.fromCharCode(view.getUint8(0), view.getUint8(1), view.getUint8(2), 
+                view.getUint8(3), view.getUint8(4)) === 'solid';
+
+            return isASCII ? parseSTLASCII(arrayBuffer) : parseSTLBinary(arrayBuffer);
+        }
+
+        function parseSTLBinary(arrayBuffer) {
+            const view = new DataView(arrayBuffer);
+            const triangles = view.getUint32(80, true);
+            
+            const vertices = [];
+            const normals = [];
+
+            for (let i = 0; i < triangles; i++) {
+                const offset = 84 + i * 50;
+                
+                const nx = view.getFloat32(offset, true);
+                const ny = view.getFloat32(offset + 4, true);
+                const nz = view.getFloat32(offset + 8, true);
+
+                for (let j = 0; j < 3; j++) {
+                    const vOffset = offset + 12 + j * 12;
+                    vertices.push(
+                        view.getFloat32(vOffset, true),
+                        view.getFloat32(vOffset + 4, true),
+                        view.getFloat32(vOffset + 8, true)
+                    );
+                    normals.push(nx, ny, nz);
+                }
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
+            
+            return geometry;
+        }
+
+        function parseSTLASCII(arrayBuffer) {
+            const text = new TextDecoder().decode(arrayBuffer);
+            const vertices = [];
+            
+            const vertexPattern = /vertex\s+([\d.e+-]+)\s+([\d.e+-]+)\s+([\d.e+-]+)/g;
+            let match;
+            
+            while ((match = vertexPattern.exec(text)) !== null) {
+                vertices.push(
+                    parseFloat(match[1]),
+                    parseFloat(match[2]),
+                    parseFloat(match[3])
+                );
+            }
+            
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            return geometry;
+        }
+
+        function toggleMeasurementMode(mode) {
+            if (measurementMode === mode) {
+                measurementMode = null;
+                distanceBtn.classList.remove('active');
+                angleBtn.classList.remove('active');
+                statusDiv.textContent = '';
+                canvas.style.cursor = 'grab';
+            } else {
+                measurementMode = mode;
+                distanceBtn.classList.toggle('active', mode === 'distance');
+                angleBtn.classList.toggle('active', mode === 'angle');
+                canvas.style.cursor = 'crosshair';
+                updateStatus();
+            }
+            clearSelection();
+        }
+
+        function updateStatus() {
+            if (measurementMode === 'distance') {
+                statusDiv.textContent = `Click 2 points to measure distance (${selectedPoints.length}/2 selected)`;
+            } else if (measurementMode === 'angle') {
+                statusDiv.textContent = `Click 3 points to measure angle (${selectedPoints.length}/3 selected)`;
+            }
+        }
+
+        function handleCanvasClick(event) {
+            if (!measurementMode || !model) return;
+
+            const rect = canvas.getBoundingClientRect();
+            mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObject(model);
+
+            if (intersects.length > 0) {
+                const point = intersects[0].point;
+                addPointMarker(point);
+                selectedPoints.push(point);
+                updateStatus();
+
+                if (measurementMode === 'distance' && selectedPoints.length === 2) {
+                    calculateDistance();
+                    clearSelection();
+                    toggleMeasurementMode('distance');
+                } else if (measurementMode === 'angle' && selectedPoints.length === 3) {
+                    calculateAngle();
+                    clearSelection();
+                    toggleMeasurementMode('angle');
+                }
+            }
+        }
+
+        function addPointMarker(point) {
+            const geometry = new THREE.SphereGeometry(0.5, 16, 16);
+            const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+            const marker = new THREE.Mesh(geometry, material);
+            marker.position.copy(point);
+            scene.add(marker);
+            pointMarkers.push(marker);
+        }
+
+        function clearSelection() {
+            selectedPoints = [];
+            pointMarkers.forEach(marker => scene.remove(marker));
+            pointMarkers = [];
+        }
+
+        function calculateDistance() {
+            const distance = selectedPoints[0].distanceTo(selectedPoints[1]);
+            const convertedDistance = convertUnits(distance);
+            measurements.push({
+                type: 'distance',
+                value: convertedDistance.toFixed(2),
+                unit: currentUnit,
+                rawValue: distance,
+                points: selectedPoints.map(p => ({ 
+                    x: p.x.toFixed(2), 
+                    y: p.y.toFixed(2), 
+                    z: p.z.toFixed(2) 
+                }))
+            });
+            updateMeasurementsDisplay();
+        }
+
+        function calculateAngle() {
+            const v1 = new THREE.Vector3().subVectors(selectedPoints[0], selectedPoints[1]);
+            const v2 = new THREE.Vector3().subVectors(selectedPoints[2], selectedPoints[1]);
+            const angle = v1.angleTo(v2) * (180 / Math.PI);
+            
+            measurements.push({
+                type: 'angle',
+                value: angle.toFixed(2),
+                unit: '°',
+                points: selectedPoints.map(p => ({ 
+                    x: p.x.toFixed(2), 
+                    y: p.y.toFixed(2), 
+                    z: p.z.toFixed(2) 
+                }))
+            });
+            updateMeasurementsDisplay();
+        }
+
+        function convertUnits(value) {
+            // Assuming the model units are in mm
+            switch(currentUnit) {
+                case 'mm': return value;
+                case 'cm': return value / 10;
+                case 'm': return value / 1000;
+                case 'in': return value / 25.4;
+                default: return value;
+            }
+        }
+
+        function handleUnitChange() {
+            currentUnit = unitSelect.value;
+            // Recalculate all distance measurements with new unit
+            measurements = measurements.map(m => {
+                if (m.type === 'distance' && m.rawValue !== undefined) {
+                    const convertedValue = convertUnits(m.rawValue);
+                    return {
+                        ...m,
+                        value: convertedValue.toFixed(2),
+                        unit: currentUnit
+                    };
+                }
+                return m;
+            });
+            updateMeasurementsDisplay();
+        }
+
+        function updateMeasurementsDisplay() {
+            if (measurements.length === 0) {
+                measurementsDiv.innerHTML = '<p class="no-measurements">No measurements yet</p>';
+                clearBtn.disabled = true;
+            } else {
+                measurementsDiv.innerHTML = measurements.map((m, i) => `
+                    <div class="measurement">
+                        <div class="measurement-header">
+                            <span class="measurement-type">${m.type}</span>
+                            <span class="measurement-value">${m.value} ${m.unit}</span>
+                        </div>
+                        <div class="measurement-points">
+                            ${m.points.map((p, j) => `P${j + 1}: (${p.x}, ${p.y}, ${p.z})`).join('<br>')}
+                        </div>
+                    </div>
+                `).join('');
+                clearBtn.disabled = false;
+            }
+        }
+
+        function clearMeasurements() {
+            measurements = [];
+            clearSelection();
+            updateMeasurementsDisplay();
+        }
+
+        function handleMouseDown(e) {
+            if (measurementMode) return;
+            isDragging = true;
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        }
+
+        function handleMouseMove(e) {
+            if (!isDragging || measurementMode || !model) return;
+            
+            const deltaX = e.clientX - previousMousePosition.x;
+            const deltaY = e.clientY - previousMousePosition.y;
+            
+            rotation.y += deltaX * 0.005;
+            rotation.x += deltaY * 0.005;
+            
+            model.rotation.y = rotation.y;
+            model.rotation.x = rotation.x;
+            
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        }
+
+        function handleMouseUp() {
+            isDragging = false;
+        }
+
+        function handleWheel(e) {
+            e.preventDefault();
+            const delta = e.deltaY * 0.1;
+            camera.position.z += delta;
+            camera.position.z = Math.max(10, Math.min(500, camera.position.z));
+        }
+
+        function handleResize() {
+            camera.aspect = canvas.clientWidth / canvas.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+        }
+
+        init();
+    </script>
+</body>
+</html>
