@@ -664,7 +664,7 @@
             angleOrigin = origin.clone();
             
             // Create origin marker (green center point)
-            const originGeometry = new THREE.SphereGeometry(0.8, 16, 16);
+            const originGeometry = new THREE.SphereGeometry(0.2, 8, 8);
             const originMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
             const originMarker = new THREE.Mesh(originGeometry, originMaterial);
             originMarker.position.copy(angleOrigin);
@@ -716,7 +716,7 @@
         }
 
         function createEndMarker(position, color) {
-            const geometry = new THREE.SphereGeometry(0.6, 16, 16);
+            const geometry = new THREE.SphereGeometry(0.2, 8, 8);
             const material = new THREE.MeshBasicMaterial({ color: color });
             const marker = new THREE.Mesh(geometry, material);
             marker.position.copy(position);
@@ -736,8 +736,10 @@
             
             // Calculate angle from positive X-axis
             // atan2 returns angle in radians from -PI to PI
-            let angle = Math.atan2(measurementVector.y, measurementVector.x) * (180 / Math.PI);
+            // let angle = Math.atan2(measurementVector.y, measurementVector.x) * (180 / Math.PI);
             
+            let angle = 90 - (Math.atan2(measurementVector.y, measurementVector.x) * 180 / Math.PI);
+
             // Normalize to 0-360 degrees
             if (angle < 0) angle += 360;
             
@@ -787,7 +789,7 @@
 
         function createPermanentAngleVisuals(origin, end, measurementIndex) {
             // Create permanent origin marker (green center)
-            const originGeometry = new THREE.SphereGeometry(0.8, 16, 16);
+            const originGeometry = new THREE.SphereGeometry(0.2, 8, 8);
             const originMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
             const originMarker = new THREE.Mesh(originGeometry, originMaterial);
             originMarker.position.copy(origin);
@@ -828,7 +830,7 @@
             scene.add(line);
             
             // Create permanent end marker (red)
-            const endGeometry = new THREE.SphereGeometry(0.6, 16, 16);
+            const endGeometry = new THREE.SphereGeometry(0.2, 8, 8);
             const endMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
             const endMarker = new THREE.Mesh(endGeometry, endMaterial);
             endMarker.position.copy(end);
@@ -847,7 +849,7 @@
         }
 
         function addPointMarker(point) {
-            const geometry = new THREE.SphereGeometry(0.5, 16, 16);
+            const geometry = new THREE.SphereGeometry(0.2, 8, 8);
             const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
             const marker = new THREE.Mesh(geometry, material);
             marker.position.copy(point);
@@ -912,13 +914,13 @@
 
         function createPermanentDistanceVisuals(point1, point2, measurementIndex) {
             // Create permanent markers
-            const marker1Geometry = new THREE.SphereGeometry(0.5, 16, 16);
+            const marker1Geometry = new THREE.SphereGeometry(0.2, 8, 8);
             const marker1Material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
             const marker1 = new THREE.Mesh(marker1Geometry, marker1Material);
             marker1.position.copy(point1);
             scene.add(marker1);
             
-            const marker2Geometry = new THREE.SphereGeometry(0.5, 16, 16);
+            const marker2Geometry = new THREE.SphereGeometry(0.2, 8, 8);
             const marker2Material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
             const marker2 = new THREE.Mesh(marker2Geometry, marker2Material);
             marker2.position.copy(point2);
@@ -1183,102 +1185,168 @@
             }
         }
         
+        // function analyzeResults() {
+        //     const t1 = calculatedTapers.taper1;
+        //     const t2 = calculatedTapers.taper2;
+        //     const t3 = calculatedTapers.taper3;
+        //     const height = calculatedTapers.height;
+        //     const maxTaper = Math.max(t1, t2);
+            
+        //     let analysis = '';
+        //     let recommendations = [];
+            
+        //     // Analysis conditions
+        //     const condition1 = t1 > t3 && t2 > t3;
+        //     const condition2 = t1 > t3 || t2 > t3;
+        //     const condition3 = t1 <= t3 && t2 <= t3;
+        //     const shortCrown = height < 3.5;
+        //     const highTaperShort = maxTaper > 15 && height < 4;
+        //     const veryHighTaper = maxTaper > 20;
+            
+        //     // Display analysis
+        //     analysis += `
+        //         <div style="background: #3d3d5c; padding: 15px; border-radius: 5px; margin-bottom: 10px;">
+        //             <div style="font-size: 13px; color: #9ca3af; margin-bottom: 10px;">
+        //                 <strong>Values:</strong><br>
+        //                 Taper 1: ${t1.toFixed(2)}° | Taper 2: ${t2.toFixed(2)}° | Taper 3: ${t3}°<br>
+        //                 Height (C): ${height.toFixed(2)}mm
+        //             </div>
+        //     `;
+            
+        //     if (condition1) {
+        //         analysis += `<div style="background: #7c2d12; padding: 10px; border-radius: 4px; margin-bottom: 8px; font-size: 13px;">
+        //             ⚠️ <strong>Excessive taper in all directions</strong><br>
+        //             T1 (${t1.toFixed(2)}°) > T3 (${t3}°) AND T2 (${t2.toFixed(2)}°) > T3 (${t3}°)
+        //         </div>`;
+        //         recommendations.push({ severity: 'high', text: 'Add grooves and boxes' });
+        //     } else if (condition2) {
+        //         analysis += `<div style="background: #854d0e; padding: 10px; border-radius: 4px; margin-bottom: 8px; font-size: 13px;">
+        //             ⚠️ <strong>Excessive taper in one direction</strong><br>
+        //             ${t1 > t3 ? `T1 (${t1.toFixed(2)}°) > T3 (${t3}°)` : `T2 (${t2.toFixed(2)}°) > T3 (${t3}°)`}
+        //         </div>`;
+        //         recommendations.push({ severity: 'medium', text: 'Add groove only (preferably buccal or proximal)' });
+        //     } else if (condition3) {
+        //         analysis += `<div style="background: #065f46; padding: 10px; border-radius: 4px; margin-bottom: 8px; font-size: 13px;">
+        //             ✓ <strong>Conservative taper</strong><br>
+        //             T1 (${t1.toFixed(2)}°) ≤ T3 (${t3}°) AND T2 (${t2.toFixed(2)}°) ≤ T3 (${t3}°)
+        //         </div>`;
+        //         recommendations.push({ severity: 'low', text: 'No auxiliary features needed' });
+        //     }
+            
+        //     if (shortCrown) {
+        //         analysis += `<div style="background: #7c2d12; padding: 10px; border-radius: 4px; margin-bottom: 8px; font-size: 13px;">
+        //             ⚠️ <strong>Short clinical crown</strong><br>
+        //             Height (${height.toFixed(2)}mm) < 3.5mm
+        //         </div>`;
+        //         recommendations.push({ severity: 'high', text: 'Add grooves and/or boxes (short crown override)' });
+        //     }
+            
+        //     if (highTaperShort) {
+        //         analysis += `<div style="background: #991b1b; padding: 10px; border-radius: 4px; margin-bottom: 8px; font-size: 13px;">
+        //             🔴 <strong>High taper + short height</strong><br>
+        //             Max taper (${maxTaper.toFixed(2)}°) > 15° AND Height (${height.toFixed(2)}mm) < 4mm
+        //         </div>`;
+        //         recommendations.push({ severity: 'critical', text: 'Strongly recommend proximal box' });
+        //     }
+            
+        //     if (veryHighTaper) {
+        //         analysis += `<div style="background: #991b1b; padding: 10px; border-radius: 4px; margin-bottom: 8px; font-size: 13px;">
+        //             🔴 <strong>Very high taper</strong><br>
+        //             Max taper (${maxTaper.toFixed(2)}°) > 20°
+        //         </div>`;
+        //         recommendations.push({ severity: 'critical', text: 'Add both groove and box for retention rescue' });
+        //     }
+            
+        //     analysis += `</div>`;
+            
+        //     document.getElementById('analysisResults').innerHTML = analysis;
+            
+        //     // Show recommendations
+        //     let recsHtml = '';
+        //     recommendations.forEach((rec, i) => {
+        //         const bgColor = rec.severity === 'critical' ? '#991b1b' : 
+        //                        rec.severity === 'high' ? '#7c2d12' : 
+        //                        rec.severity === 'medium' ? '#854d0e' : '#065f46';
+        //         recsHtml += `
+        //             <div style="background: ${bgColor}; padding: 15px; border-radius: 5px; margin-bottom: 10px;">
+        //                 <div style="font-weight: 600; margin-bottom: 5px; font-size: 14px;">
+        //                     ${rec.severity === 'critical' ? '🔴' : rec.severity === 'high' ? '⚠️' : rec.severity === 'medium' ? '⚠️' : '✓'} 
+        //                     Recommendation ${i + 1}
+        //                 </div>
+        //                 <div style="font-size: 13px;">${rec.text}</div>
+        //             </div>
+        //         `;
+        //     });
+            
+        //     document.getElementById('recommendations').innerHTML = recsHtml;
+        //     document.getElementById('step3').style.display = 'block';
+        // }
+
         function analyzeResults() {
             const t1 = calculatedTapers.taper1;
             const t2 = calculatedTapers.taper2;
             const t3 = calculatedTapers.taper3;
             const height = calculatedTapers.height;
             const maxTaper = Math.max(t1, t2);
-            
-            let analysis = '';
-            let recommendations = [];
-            
-            // Analysis conditions
-            const condition1 = t1 > t3 && t2 > t3;
-            const condition2 = t1 > t3 || t2 > t3;
-            const condition3 = t1 <= t3 && t2 <= t3;
-            const shortCrown = height < 3.5;
-            const highTaperShort = maxTaper > 15 && height < 4;
-            const veryHighTaper = maxTaper > 20;
-            
-            // Display analysis
-            analysis += `
-                <div style="background: #3d3d5c; padding: 15px; border-radius: 5px; margin-bottom: 10px;">
-                    <div style="font-size: 13px; color: #9ca3af; margin-bottom: 10px;">
-                        <strong>Values:</strong><br>
-                        Taper 1: ${t1.toFixed(2)}° | Taper 2: ${t2.toFixed(2)}° | Taper 3: ${t3}°<br>
-                        Height (C): ${height.toFixed(2)}mm
+
+            let finalPriority = null;
+            let finalMessage = "";
+
+            // PRIORITY 1
+            if (maxTaper > 20) {
+                finalPriority = 1;
+                finalMessage = "Add grooves on both buccal and proximal surfaces (dual grooves).";
+            }
+
+            // PRIORITY 2
+            else if (height < 3.5) {
+                finalPriority = 2;
+                finalMessage = "Add grooves on both buccal and proximal surfaces (dual grooves).";
+            }
+
+            // PRIORITY 3
+            else if (maxTaper > 15 && height < 4.0) {
+                finalPriority = 3;
+                finalMessage = "Add a proximal groove (single groove).";
+            }
+
+            // PRIORITY 4
+            else if (t1 > t3 && t2 > t3) {
+                finalPriority = 4;
+                finalMessage = "Add grooves on both the more tapered surfaces (dual grooves).";
+            }
+
+            // PRIORITY 5
+            else if ((t1 > t3 && t2 <= t3) || (t2 > t3 && t1 <= t3)) {
+                finalPriority = 5;
+                finalMessage = "Add one groove on the more tapered surface (prefer proximal if equal).";
+            }
+
+            // PRIORITY 6
+            else if (t1 <= t3 && t2 <= t3 && height >= 4.0) {
+                finalPriority = 6;
+                finalMessage = "No grooves needed.";
+            }
+
+            // Display final output
+            const resultHTML = `
+                <div style="background:#3d3d5c;padding:15px;border-radius:5px;margin-bottom:10px;">
+                    <strong style="font-size:16px;color:#60a5fa;">Final Recommendation (Priority ${finalPriority})</strong>
+                    <p style="margin-top:10px;font-size:14px;">${finalMessage}</p>
+
+                    <div style="margin-top:12px;font-size:12px;color:#9ca3af;">
+                        <strong>Values Used:</strong><br>
+                        Taper 1: ${t1.toFixed(2)}°<br>
+                        Taper 2: ${t2.toFixed(2)}°<br>
+                        Taper 3: ${t3}°<br>
+                        Height: ${height.toFixed(2)} mm
                     </div>
+                </div>
             `;
-            
-            if (condition1) {
-                analysis += `<div style="background: #7c2d12; padding: 10px; border-radius: 4px; margin-bottom: 8px; font-size: 13px;">
-                    ⚠️ <strong>Excessive taper in all directions</strong><br>
-                    T1 (${t1.toFixed(2)}°) > T3 (${t3}°) AND T2 (${t2.toFixed(2)}°) > T3 (${t3}°)
-                </div>`;
-                recommendations.push({ severity: 'high', text: 'Add grooves and boxes' });
-            } else if (condition2) {
-                analysis += `<div style="background: #854d0e; padding: 10px; border-radius: 4px; margin-bottom: 8px; font-size: 13px;">
-                    ⚠️ <strong>Excessive taper in one direction</strong><br>
-                    ${t1 > t3 ? `T1 (${t1.toFixed(2)}°) > T3 (${t3}°)` : `T2 (${t2.toFixed(2)}°) > T3 (${t3}°)`}
-                </div>`;
-                recommendations.push({ severity: 'medium', text: 'Add groove only (preferably buccal or proximal)' });
-            } else if (condition3) {
-                analysis += `<div style="background: #065f46; padding: 10px; border-radius: 4px; margin-bottom: 8px; font-size: 13px;">
-                    ✓ <strong>Conservative taper</strong><br>
-                    T1 (${t1.toFixed(2)}°) ≤ T3 (${t3}°) AND T2 (${t2.toFixed(2)}°) ≤ T3 (${t3}°)
-                </div>`;
-                recommendations.push({ severity: 'low', text: 'No auxiliary features needed' });
-            }
-            
-            if (shortCrown) {
-                analysis += `<div style="background: #7c2d12; padding: 10px; border-radius: 4px; margin-bottom: 8px; font-size: 13px;">
-                    ⚠️ <strong>Short clinical crown</strong><br>
-                    Height (${height.toFixed(2)}mm) < 3.5mm
-                </div>`;
-                recommendations.push({ severity: 'high', text: 'Add grooves and/or boxes (short crown override)' });
-            }
-            
-            if (highTaperShort) {
-                analysis += `<div style="background: #991b1b; padding: 10px; border-radius: 4px; margin-bottom: 8px; font-size: 13px;">
-                    🔴 <strong>High taper + short height</strong><br>
-                    Max taper (${maxTaper.toFixed(2)}°) > 15° AND Height (${height.toFixed(2)}mm) < 4mm
-                </div>`;
-                recommendations.push({ severity: 'critical', text: 'Strongly recommend proximal box' });
-            }
-            
-            if (veryHighTaper) {
-                analysis += `<div style="background: #991b1b; padding: 10px; border-radius: 4px; margin-bottom: 8px; font-size: 13px;">
-                    🔴 <strong>Very high taper</strong><br>
-                    Max taper (${maxTaper.toFixed(2)}°) > 20°
-                </div>`;
-                recommendations.push({ severity: 'critical', text: 'Add both groove and box for retention rescue' });
-            }
-            
-            analysis += `</div>`;
-            
-            document.getElementById('analysisResults').innerHTML = analysis;
-            
-            // Show recommendations
-            let recsHtml = '';
-            recommendations.forEach((rec, i) => {
-                const bgColor = rec.severity === 'critical' ? '#991b1b' : 
-                               rec.severity === 'high' ? '#7c2d12' : 
-                               rec.severity === 'medium' ? '#854d0e' : '#065f46';
-                recsHtml += `
-                    <div style="background: ${bgColor}; padding: 15px; border-radius: 5px; margin-bottom: 10px;">
-                        <div style="font-weight: 600; margin-bottom: 5px; font-size: 14px;">
-                            ${rec.severity === 'critical' ? '🔴' : rec.severity === 'high' ? '⚠️' : rec.severity === 'medium' ? '⚠️' : '✓'} 
-                            Recommendation ${i + 1}
-                        </div>
-                        <div style="font-size: 13px;">${rec.text}</div>
-                    </div>
-                `;
-            });
-            
-            document.getElementById('recommendations').innerHTML = recsHtml;
-            document.getElementById('step3').style.display = 'block';
+
+            document.getElementById("analysisResults").innerHTML = resultHTML;
         }
+
 
         function updateMeasurementLabel(index, newLabel) {
             if (measurements[index]) {
