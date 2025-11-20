@@ -27,7 +27,7 @@
         }
 
         #header {
-            background: #2d2d44;
+            background: #a5a6f5;
             padding: 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.3);
         }
@@ -160,7 +160,7 @@
 
         #sidebar {
             width: 320px;
-            background: #2d2d44;
+            background: #a5a6f5;
             padding: 20px;
             overflow-y: auto;
             border-left: 1px solid #4a4a6a;
@@ -426,7 +426,7 @@
         function init() {
             // Scene
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x1a1a2e);
+            scene.background = new THREE.Color(0xBAB7E2);
 
             // Camera
             camera = new THREE.PerspectiveCamera(
@@ -510,9 +510,9 @@
 
             const geometry = parseSTL(arrayBuffer);
             geometry.computeVertexNormals();
-            geometry.center();
 
             const material = new THREE.MeshPhongMaterial({
+                color: 0x58BDDC,
                 specular: 0x111111,
                 shininess: 200
             });
