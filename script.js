@@ -1244,4 +1244,210 @@ function handleTouchEnd(e) {
     isTouchDragging = false;
 }
 
+// Modal functions
+function showAngleInfo() {
+    const modalHTML = `
+        <div class="modal-overlay" onclick="closeModal(event)">
+            <div class="modal" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <div class="modal-title">
+                        📐 Angle Measurements Guide
+                    </div>
+                    <button class="modal-close" onclick="closeModal()">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-section">
+                        <h3>🎯 What Are Angle Measurements?</h3>
+                        <p>Angle measurements capture the taper or convergence angle of the preparation from different perspectives. You need to measure <strong>4 angles</strong> to get a comprehensive taper analysis.</p>
+                    </div>
+                    
+                    <div class="modal-section">
+                        <h3>📍 How to Measure</h3>
+                        <ul>
+                            <li><strong>First Click:</strong> Place the origin point (green center marker) at the occlusal surface center</li>
+                            <li><strong>Second Click:</strong> Click on the model at the gingival margin to create the measurement line</li>
+                            <li>The angle is automatically calculated from the X-axis (horizontal reference)</li>
+                            <li>Gray reference axes (X, X', Y, Y') help you visualize the measurement plane</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="modal-section">
+                        <h3>🔢 The 4 Required Angles</h3>
+                        <ul>
+                            <li><strong>Angle 1:</strong> Buccal surface taper angle</li>
+                            <li><strong>Angle 2:</strong> Lingual surface taper angle</li>
+                            <li><strong>Angle 3:</strong> Mesial surface taper angle</li>
+                            <li><strong>Angle 4:</strong> Distal surface taper angle</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="modal-tip">
+                        <strong>💡 Pro Tip</strong>
+                        <p>Measure from the same occlusal reference point for all 4 angles to ensure consistency. The displayed angle is automatically normalized to 0-90° for easier interpretation.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+function showDistanceInfo() {
+    const modalHTML = `
+        <div class="modal-overlay" onclick="closeModal(event)">
+            <div class="modal" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <div class="modal-title">
+                        📏 Distance Measurements Guide
+                    </div>
+                    <button class="modal-close" onclick="closeModal()">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="modal-section">
+                        <h3>🎯 What Are Distance Measurements?</h3>
+                        <p>Distance measurements capture the width and height dimensions of the preparation. You need <strong>3 measurements</strong> (B1, B2, and C) for complete taper analysis.</p>
+                    </div>
+                    
+                    <div class="modal-section">
+                        <h3>📍 How to Measure</h3>
+                        <ul>
+                            <li><strong>First Click:</strong> Click the starting point on the model</li>
+                            <li><strong>Second Click:</strong> Click the ending point to complete the measurement</li>
+                            <li>A yellow line connects the two points with red sphere markers</li>
+                            <li>Distance is calculated in 3D space and displayed in your selected unit</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="modal-section">
+                        <h3>🔢 The 3 Required Measurements</h3>
+                        <ul>
+                            <li><strong>B1 (Width 1):</strong> Maximum width at the occlusal surface - measure the widest point across the preparation top</li>
+                            <li><strong>B2 (Width 2):</strong> Minimum width at the gingival margin - measure the narrowest point at the finish line</li>
+                            <li><strong>C (Height):</strong> Vertical height of the preparation - measure from occlusal surface to gingival margin</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="modal-tip">
+                        <strong>💡 Pro Tip</strong>
+                        <p>For B1 and B2, measure along the same axis (typically buccal-lingual) to get accurate taper calculations. C should be measured perpendicular to the occlusal plane for proper height assessment.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+function showInstructionInfo() {
+    const modalHTML = `
+        <div class="modal-overlay" onclick="closeModal(event)">
+            <div class="modal" onclick="event.stopPropagation()">
+                
+                <div class="modal-header">
+                    <div class="modal-title">📘 T-METRY – Instructions Guide</div>
+                    <button class="modal-close" onclick="closeModal()">×</button>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="modal-section">
+                        <h3>📂 1. Upload the STL File</h3>
+                        <p>Load the prepared tooth STL file using the <strong>Load STL</strong> button. Supported format: <strong>.stl</strong>.</p>
+                    </div>
+
+                    <div class="modal-section">
+                        <h3>🦷 2. Orient the 3D Model</h3>
+                        <ul>
+                            <li>Rotate the model using your mouse/touchpad.</li>
+                            <li>Zoom in/out to view details clearly.</li>
+                            <li>Ensure margins and axial walls are fully visible before measuring.</li>
+                        </ul>
+                    </div>
+
+                    <div class="modal-section">
+                        <h3>📏 3. Measure Width (Buccolingual)</h3>
+                        <ul>
+                            <li>Select the <strong>Measure Width</strong> tool.</li>
+                            <li>Click two points across the tip (Point 1 → Point 2).</li>
+                            <li>Click two points across the base (Point 1 → Point 2).</li>
+                            <li>The software displays both measurements automatically.</li>
+                        </ul>
+                    </div>
+
+                    <div class="modal-section">
+                        <h3>📐 4. Measure Height (Axial Wall)</h3>
+                        <ul>
+                            <li>Select the <strong>Measure Height</strong> tool.</li>
+                            <li>Click at the finish line (Point 1).</li>
+                            <li>Click at the occlusal end of the axial wall (Point 2).</li>
+                            <li>Repeat on the opposite side.</li>
+                            <li>The app shows the average height instantly.</li>
+                        </ul>
+                    </div>
+
+                    <div class="modal-section">
+                        <h3>📐 5. Measure Taper Angles</h3>
+                        <ul>
+                            <li>Select <strong>Measure Taper</strong>.</li>
+                            <li>Align the tooth to view mesial & distal axial walls.</li>
+                            <li>Click one point on the mesial wall.</li>
+                            <li>Click one point on the distal wall.</li>
+                            <li>The app calculates the taper angle automatically.</li>
+                        </ul>
+                    </div>
+
+                    <div class="modal-section">
+                        <h3>📊 6. Angle Calculations</h3>
+                        <p>Click <strong>Calculate Taper</strong> to display:</p>
+                        <ul>
+                            <li>Taper 1 angle</li>
+                            <li>Taper 2 angle</li>
+                            <li>Taper 3 angle</li>
+                        </ul>
+                    </div>
+
+                    <div class="modal-section">
+                        <h3>🧠 7. Recommendation Generation</h3>
+                        <ul>
+                            <li>Click <strong>Analyze Results</strong>.</li>
+                            <li>The app instantly shows preparation feedback.</li>
+                        </ul>
+                    </div>
+
+                    <div class="modal-tip">
+                        <strong>💡 Pro Tip</strong>
+                        <p>Always capture width, height, and taper on both sides for accurate analysis.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+}
+
+
+function closeModal(event) {
+    if (event) {
+        // Only close if clicking the overlay or close button
+        if (event.target.classList.contains('modal-overlay') || event.currentTarget.classList.contains('modal-close')) {
+            const modal = document.querySelector('.modal-overlay');
+            if (modal) modal.remove();
+        }
+    } else {
+        // Direct call to closeModal()
+        const modal = document.querySelector('.modal-overlay');
+        if (modal) modal.remove();
+    }
+}
+
+// Close modal on Escape key
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeModal();
+    }
+});
+
 init();
