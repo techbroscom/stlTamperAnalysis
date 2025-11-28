@@ -27,7 +27,7 @@ body {
 }
 
 .app-title {
-    font-size: 20px;
+    font-size: 24px;
     font-weight: 700;
     margin-bottom: 4px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -37,7 +37,7 @@ body {
 }
 
 .app-subtitle {
-    font-size: 11px;
+    font-size: 13px;
     color: #9ca3af;
     margin-bottom: 12px;
     font-weight: 500;
@@ -93,7 +93,7 @@ body {
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 11px;
+    font-size: 13px;
     color: #667eea;
     flex-shrink: 0;
 }
@@ -108,7 +108,7 @@ body {
 }
 
 .step-label {
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 600;
     color: #6b7280;
     white-space: nowrap;
@@ -138,7 +138,7 @@ body {
 }
 
 .control-section-title {
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 700;
     color: #667eea;
     margin-bottom: 6px;
@@ -176,7 +176,7 @@ button, .file-label {
     padding: 8px 14px;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -230,7 +230,7 @@ button.clear:hover {
     padding: 8px 12px;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 600;
     transition: all 0.3s ease;
 }
@@ -244,14 +244,14 @@ button.clear:hover {
 }
 
 #info {
-    font-size: 10px;
+    font-size: 12px;
     color: #6b7280;
     margin-top: 6px;
     font-weight: 500;
 }
 
 #status {
-    font-size: 10px;
+    font-size: 12px;
     color: #f59e0b;
     margin-top: 5px;
     font-weight: 600;
@@ -315,7 +315,7 @@ button.clear:hover {
 
 .modal-title {
     color: white;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     display: flex;
     align-items: center;
@@ -358,7 +358,7 @@ button.clear:hover {
 }
 
 .modal-section h3 {
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 700;
     color: #667eea;
     margin-bottom: 10px;
@@ -368,7 +368,7 @@ button.clear:hover {
 }
 
 .modal-section p {
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1.6;
     color: #4b5563;
     margin-bottom: 10px;
@@ -380,7 +380,7 @@ button.clear:hover {
 }
 
 .modal-section li {
-    font-size: 13px;
+    font-size: 15px;
     line-height: 1.6;
     color: #4b5563;
     padding-left: 20px;
@@ -406,7 +406,7 @@ button.clear:hover {
 
 .modal-tip strong {
     color: #1e40af;
-    font-size: 12px;
+    font-size: 14px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -415,6 +415,7 @@ button.clear:hover {
     color: #1e3a8a;
     margin-top: 6px;
     margin-bottom: 0;
+    font-size: 14px;
 }
 
 .modal-image {
@@ -467,7 +468,7 @@ button.clear:hover {
 }
 
 #placeholder p {
-    font-size: 14px;
+    font-size: 16px;
 }
 
 #sidebar {
@@ -488,7 +489,7 @@ button.clear:hover {
 
 #sidebar h2 {
     margin-bottom: 15px;
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     color: #1a1a2e;
 }
@@ -498,7 +499,7 @@ button.clear:hover {
 }
 
 .sidebar-section-title {
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 700;
     color: #667eea;
     margin-bottom: 10px;
@@ -532,13 +533,13 @@ button.clear:hover {
 .measurement-type {
     font-weight: 700;
     text-transform: uppercase;
-    font-size: 10px;
+    font-size: 12px;
     color: #667eea;
     letter-spacing: 0.5px;
 }
 
 .measurement-value {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 700;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     -webkit-background-clip: text;
@@ -547,7 +548,7 @@ button.clear:hover {
 }
 
 .measurement-points {
-    font-size: 9px;
+    font-size: 11px;
     color: #9ca3af;
     font-family: 'Courier New', monospace;
     margin-top: 6px;
@@ -567,7 +568,7 @@ button.clear:hover {
     color: #1a1a2e;
     padding: 6px 10px;
     border-radius: 6px;
-    font-size: 11px;
+    font-size: 13px;
     font-weight: 600;
     transition: all 0.3s ease;
 }
@@ -585,7 +586,7 @@ button.clear:hover {
     padding: 6px 12px;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 600;
     transition: all 0.3s ease;
 }
@@ -597,7 +598,7 @@ button.clear:hover {
 
 .no-measurements {
     color: #9ca3af;
-    font-size: 12px;
+    font-size: 14px;
     text-align: center;
     padding: 30px;
 }
@@ -609,7 +610,7 @@ button.clear:hover {
 }
 
 .workflow-section h2 {
-    font-size: 16px;
+    font-size: 18px;
     margin-bottom: 15px;
     color: #1a1a2e;
 }
@@ -625,7 +626,7 @@ button.clear:hover {
     border-radius: 8px;
     margin-bottom: 10px;
     font-weight: 700;
-    font-size: 12px;
+    font-size: 14px;
     display: flex;
     align-items: center;
     gap: 8px;
@@ -635,7 +636,7 @@ button.clear:hover {
     width: 100%;
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
     padding: 12px;
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 700;
     border-radius: 8px;
     margin-bottom: 10px;
@@ -659,6 +660,7 @@ button.clear:hover {
     padding: 12px;
     border-radius: 8px;
     margin-bottom: 10px;
+    font-size: 14px;
 }
 
 .taper-result.error {
@@ -675,7 +677,7 @@ button.clear:hover {
 }
 
 .recommendation-priority {
-    font-size: 10px;
+    font-size: 12px;
     font-weight: 700;
     color: #3b82f6;
     text-transform: uppercase;
@@ -684,14 +686,14 @@ button.clear:hover {
 }
 
 .recommendation-text {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     color: #1e40af;
     margin-bottom: 10px;
 }
 
 .recommendation-values {
-    font-size: 10px;
+    font-size: 12px;
     color: #6b7280;
     padding-top: 10px;
     border-top: 1px solid #bfdbfe;
@@ -751,11 +753,11 @@ button.clear:hover {
     }
 
     .app-title {
-        font-size: 18px;
+        font-size: 20px;
     }
 
     .app-subtitle {
-        font-size: 10px;
+        font-size: 12px;
     }
 
     .progress-steps {
@@ -773,7 +775,7 @@ button.clear:hover {
 
     button, .file-label {
         padding: 7px 12px;
-        font-size: 10px;
+        font-size: 12px;
     }
 
     #sidebar {
