@@ -1274,10 +1274,10 @@ function showAngleInfo() {
                     <div class="modal-section">
                         <h3>🔢 The 4 Required Angles</h3>
                         <ul>
-                            <li><strong>Angle 1:</strong> Buccal surface taper angle</li>
-                            <li><strong>Angle 2:</strong> Lingual surface taper angle</li>
-                            <li><strong>Angle 3:</strong> Mesial surface taper angle</li>
-                            <li><strong>Angle 4:</strong> Distal surface taper angle</li>
+                            <li><strong>Angle 1:</strong> mesiobuccal taper angle</li>
+                            <li><strong>Angle 2:</strong> distobuccal taper angle</li>
+                            <li><strong>Angle 3:</strong> mesiolingual taper angle</li>
+                            <li><strong>Angle 4:</strong> distolingual taper angle</li>
                         </ul>
                     </div>
                     
@@ -1322,9 +1322,10 @@ function showDistanceInfo() {
                     <div class="modal-section">
                         <h3>🔢 The 3 Required Measurements</h3>
                         <ul>
-                            <li><strong>B1 (Width 1):</strong> Maximum width at the occlusal surface - measure the widest point across the preparation top</li>
-                            <li><strong>B2 (Width 2):</strong> Minimum width at the gingival margin - measure the narrowest point at the finish line</li>
-                            <li><strong>C (Height):</strong> Vertical height of the preparation - measure from occlusal surface to gingival margin</li>
+                            <li><strong>B1 (Width 1):</strong> maximum width at the gingival margin – measure the widest point across the prepared tooth</li>
+                            <li><strong>B2 (Width 2):</strong> maximum width at the occlusal surface – measure the narrowest point across the prepared tooth</li>
+                            <li><strong>C1 (Height 1):</strong> Vertical height of the preparation on the buccal surface - measure from the occlusal surface to the gingival margin</li>
+                            <li><strong>C2 (Height 2):</strong> Vertical height of the preparation on the lingual surface - measure from the occlusal surface to the gingival margin</li>
                         </ul>
                     </div>
                     
