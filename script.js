@@ -1306,7 +1306,7 @@ function showDistanceInfo() {
                 <div class="modal-body">
                     <div class="modal-section">
                         <h3>🎯 What Are Distance Measurements?</h3>
-                        <p>Distance measurements capture the width and height dimensions of the preparation. You need <strong>3 measurements</strong> (B1, B2, and C) for complete taper analysis.</p>
+                        <p>Distance measurements capture the width and height dimensions of the preparation. You need <strong>4 measurements</strong> (B1, B2, C1 and C2) for complete taper analysis.</p>
                     </div>
                     
                     <div class="modal-section">
@@ -1320,7 +1320,7 @@ function showDistanceInfo() {
                     </div>
                     
                     <div class="modal-section">
-                        <h3>🔢 The 3 Required Measurements</h3>
+                        <h3>🔢 The 4 Required Measurements</h3>
                         <ul>
                             <li><strong>B1 (Width 1):</strong> maximum width at the gingival margin – measure the widest point across the prepared tooth</li>
                             <li><strong>B2 (Width 2):</strong> maximum width at the occlusal surface – measure the narrowest point across the prepared tooth</li>
