@@ -24,7 +24,8 @@ const angle3Btn = document.getElementById('angle3Btn');
 const angle4Btn = document.getElementById('angle4Btn');
 const b1Btn = document.getElementById('b1Btn');
 const b2Btn = document.getElementById('b2Btn');
-const cHeightBtn = document.getElementById('cHeightBtn');
+const c1Btn = document.getElementById('c1Btn');
+const c2Btn = document.getElementById('c2Btn');
 const clearBtn = document.getElementById('clearBtn');
 const unitSelect = document.getElementById('unitSelect');
 const infoDiv = document.getElementById('info');
@@ -83,7 +84,8 @@ function init() {
     angle4Btn.addEventListener('click', () => toggleMeasurementMode('angle4'));
     b1Btn.addEventListener('click', () => toggleMeasurementMode('b1'));
     b2Btn.addEventListener('click', () => toggleMeasurementMode('b2'));
-    cHeightBtn.addEventListener('click', () => toggleMeasurementMode('cheight'));
+    c1Btn.addEventListener('click', () => toggleMeasurementMode('c1'));
+    c2Btn.addEventListener('click', () => toggleMeasurementMode('c2'));
     clearBtn.addEventListener('click', clearMeasurements);
     unitSelect.addEventListener('change', handleUnitChange);
     canvas.addEventListener('click', handleCanvasClick);
@@ -122,8 +124,9 @@ function handleFileUpload(event) {
         angle4Btn.disabled = false;
         b1Btn.disabled = false;
         b2Btn.disabled = false;
-        cHeightBtn.disabled = false;
-        
+        c1Btn.disabled = false;
+        c2Btn.disabled = false;
+
         // Show measurement controls
         angleControls.style.display = 'flex';
         distanceControls.style.display = 'flex';
@@ -156,9 +159,9 @@ function loadSTL(arrayBuffer) {
 
 function parseSTL(arrayBuffer) {
     const view = new DataView(arrayBuffer);
-    const isASCII = arrayBuffer.byteLength > 5 && 
-        String.fromCharCode(view.getUint8(0), view.getUint8(1), view.getUint8(2), 
-        view.getUint8(3), view.getUint8(4)) === 'solid';
+    const isASCII = arrayBuffer.byteLength > 5 &&
+        String.fromCharCode(view.getUint8(0), view.getUint8(1), view.getUint8(2),
+            view.getUint8(3), view.getUint8(4)) === 'solid';
 
     return isASCII ? parseSTLASCII(arrayBuffer) : parseSTLBinary(arrayBuffer);
 }
@@ -166,13 +169,13 @@ function parseSTL(arrayBuffer) {
 function parseSTLBinary(arrayBuffer) {
     const view = new DataView(arrayBuffer);
     const triangles = view.getUint32(80, true);
-    
+
     const vertices = [];
     const normals = [];
 
     for (let i = 0; i < triangles; i++) {
         const offset = 84 + i * 50;
-        
+
         const nx = view.getFloat32(offset, true);
         const ny = view.getFloat32(offset + 4, true);
         const nz = view.getFloat32(offset + 8, true);
@@ -191,17 +194,17 @@ function parseSTLBinary(arrayBuffer) {
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
     geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
-    
+
     return geometry;
 }
 
 function parseSTLASCII(arrayBuffer) {
     const text = new TextDecoder().decode(arrayBuffer);
     const vertices = [];
-    
+
     const vertexPattern = /vertex\s+([\d.e+-]+)\s+([\d.e+-]+)\s+([\d.e+-]+)/g;
     let match;
-    
+
     while ((match = vertexPattern.exec(text)) !== null) {
         vertices.push(
             parseFloat(match[1]),
@@ -209,7 +212,7 @@ function parseSTLASCII(arrayBuffer) {
             parseFloat(match[3])
         );
     }
-    
+
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
     return geometry;
@@ -224,7 +227,8 @@ function toggleMeasurementMode(mode) {
         angle4Btn.classList.remove('active');
         b1Btn.classList.remove('active');
         b2Btn.classList.remove('active');
-        cHeightBtn.classList.remove('active');
+        c1Btn.classList.remove('active');
+        c2Btn.classList.remove('active');
         statusDiv.textContent = '';
         canvas.style.cursor = 'grab';
         clearAngleTools();
@@ -236,11 +240,12 @@ function toggleMeasurementMode(mode) {
         angle4Btn.classList.toggle('active', mode === 'angle4');
         b1Btn.classList.toggle('active', mode === 'b1');
         b2Btn.classList.toggle('active', mode === 'b2');
-        cHeightBtn.classList.toggle('active', mode === 'cheight');
+        c1Btn.classList.toggle('active', mode === 'c1');
+        c2Btn.classList.toggle('active', mode === 'c2');
         canvas.style.cursor = 'crosshair';
         updateStatus();
-        
-        if (mode === 'b1' || mode === 'b2' || mode === 'cheight') {
+
+        if (mode === 'b1' || mode === 'b2' || mode === 'c1' || mode === 'c2') {
             clearAngleTools();
         }
     }
@@ -248,10 +253,10 @@ function toggleMeasurementMode(mode) {
 }
 
 function updateStatus() {
-    if (measurementMode === 'b1' || measurementMode === 'b2' || measurementMode === 'cheight') {
+    if (measurementMode === 'b1' || measurementMode === 'b2' || measurementMode === 'c1' || measurementMode === 'c2') {
         statusDiv.textContent = `Click 2 points to measure distance (${selectedPoints.length}/2 selected)`;
-    } else if (measurementMode === 'angle1' || measurementMode === 'angle2' || 
-               measurementMode === 'angle3' || measurementMode === 'angle4') {
+    } else if (measurementMode === 'angle1' || measurementMode === 'angle2' ||
+        measurementMode === 'angle3' || measurementMode === 'angle4') {
         if (!angleOrigin) {
             statusDiv.textContent = 'Click on the model to place angle origin (center point)';
         } else {
@@ -272,8 +277,8 @@ function handleCanvasClick(event) {
 
     if (intersects.length > 0) {
         const point = intersects[0].point;
-        
-        if (measurementMode === 'b1' || measurementMode === 'b2' || measurementMode === 'cheight') {
+
+        if (measurementMode === 'b1' || measurementMode === 'b2' || measurementMode === 'c1' || measurementMode === 'c2') {
             addPointMarker(point);
             selectedPoints.push(point);
             updateStatus();
@@ -283,8 +288,8 @@ function handleCanvasClick(event) {
                 clearSelection();
                 toggleMeasurementMode(measurementMode);
             }
-        } else if (measurementMode === 'angle1' || measurementMode === 'angle2' || 
-                   measurementMode === 'angle3' || measurementMode === 'angle4') {
+        } else if (measurementMode === 'angle1' || measurementMode === 'angle2' ||
+            measurementMode === 'angle3' || measurementMode === 'angle4') {
             if (!angleOrigin) {
                 // First click: create origin and axes
                 createAngleTool(point);
@@ -301,7 +306,7 @@ function handleCanvasClick(event) {
 
 function createAngleTool(origin) {
     angleOrigin = origin.clone();
-    
+
     // Create origin marker (green center point)
     const originGeometry = new THREE.SphereGeometry(0.2, 8, 8);
     const originMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
@@ -309,10 +314,10 @@ function createAngleTool(origin) {
     originMarker.position.copy(angleOrigin);
     scene.add(originMarker);
     pointMarkers.push(originMarker);
-    
+
     // Create 4 reference axes (X, X', Y, Y')
     const length = 25;
-    
+
     // X axis (positive, gray)
     const xAxisEnd = angleOrigin.clone().add(new THREE.Vector3(length, 0, 0));
     const xAxisMaterial = new THREE.LineBasicMaterial({ color: 0x808080, linewidth: 2, opacity: 0.6, transparent: true });
@@ -320,28 +325,28 @@ function createAngleTool(origin) {
     const xAxisLine = new THREE.Line(xAxisGeometry, xAxisMaterial);
     scene.add(xAxisLine);
     lineMarkers.push(xAxisLine);
-    
+
     // X' axis (negative, gray)
     const xAxisEndNeg = angleOrigin.clone().add(new THREE.Vector3(-length, 0, 0));
     const xAxisGeometryNeg = new THREE.BufferGeometry().setFromPoints([angleOrigin, xAxisEndNeg]);
     const xAxisLineNeg = new THREE.Line(xAxisGeometryNeg, xAxisMaterial);
     scene.add(xAxisLineNeg);
     lineMarkers.push(xAxisLineNeg);
-    
+
     // Y axis (positive, gray)
     const yAxisEnd = angleOrigin.clone().add(new THREE.Vector3(0, length, 0));
     const yAxisGeometry = new THREE.BufferGeometry().setFromPoints([angleOrigin, yAxisEnd]);
     const yAxisLine = new THREE.Line(yAxisGeometry, xAxisMaterial);
     scene.add(yAxisLine);
     lineMarkers.push(yAxisLine);
-    
+
     // Y' axis (negative, gray)
     const yAxisEndNeg = angleOrigin.clone().add(new THREE.Vector3(0, -length, 0));
     const yAxisGeometryNeg = new THREE.BufferGeometry().setFromPoints([angleOrigin, yAxisEndNeg]);
     const yAxisLineNeg = new THREE.Line(yAxisGeometryNeg, xAxisMaterial);
     scene.add(yAxisLineNeg);
     lineMarkers.push(yAxisLineNeg);
-    
+
     statusDiv.textContent = 'Axes created. Click on the model to place first measurement point.';
 }
 
@@ -365,20 +370,20 @@ function createEndMarker(position, color) {
 
 function finalizeAngleMeasurement(endPoint, mode) {
     if (!angleLine1 || !angleOrigin) return;
-    
+
     // Project points to 2D (XY plane) for accurate angle calculation
     const origin2D = new THREE.Vector2(angleOrigin.x, angleOrigin.y);
     const end2D = new THREE.Vector2(endPoint.x, endPoint.y);
-    
+
     // Calculate vector from origin to endpoint in 2D
     const measurementVector = new THREE.Vector2().subVectors(end2D, origin2D);
-    
+
     // Calculate angle from positive X-axis
     let angle = 90 - (Math.atan2(measurementVector.y, measurementVector.x) * 180 / Math.PI);
 
     // Normalize to 0-360 degrees
     if (angle < 0) angle += 360;
-    
+
     // Convert to angle <= 90 degrees
     let displayAngle = angle;
     if (angle > 90 && angle <= 180) {
@@ -388,7 +393,7 @@ function finalizeAngleMeasurement(endPoint, mode) {
     } else if (angle > 270) {
         displayAngle = 360 - angle;
     }
-    
+
     // Determine label based on mode
     let label;
     if (mode === 'angle1') label = 'Angle 1';
@@ -412,20 +417,20 @@ function finalizeAngleMeasurement(endPoint, mode) {
             end: endPoint.clone()
         }
     };
-    
+
     measurements.push(measurement);
-    
+
     // Create permanent visual lines for this measurement
     createPermanentAngleVisuals(angleOrigin, endPoint, measurements.length - 1);
-    
+
     // Disable the button after measurement
     if (mode === 'angle1') angle1Btn.disabled = true;
     else if (mode === 'angle2') angle2Btn.disabled = true;
     else if (mode === 'angle3') angle3Btn.disabled = true;
     else if (mode === 'angle4') angle4Btn.disabled = true;
-    
+
     updateMeasurementsDisplay();
-    
+
     // Clear temporary tools
     clearSelection();
     clearAngleTools();
@@ -439,48 +444,48 @@ function createPermanentAngleVisuals(origin, end, measurementIndex) {
     const originMarker = new THREE.Mesh(originGeometry, originMaterial);
     originMarker.position.copy(origin);
     scene.add(originMarker);
-    
+
     // Create permanent 4 reference axes (X, X', Y, Y')
     const length = 25;
     const axesMaterial = new THREE.LineBasicMaterial({ color: 0x808080, linewidth: 2, opacity: 0.6, transparent: true });
-    
+
     // X axis
     const xAxisEnd = origin.clone().add(new THREE.Vector3(length, 0, 0));
     const xAxisGeometry = new THREE.BufferGeometry().setFromPoints([origin, xAxisEnd]);
     const xAxisLine = new THREE.Line(xAxisGeometry, axesMaterial);
     scene.add(xAxisLine);
-    
+
     // X' axis (negative)
     const xAxisEndNeg = origin.clone().add(new THREE.Vector3(-length, 0, 0));
     const xAxisGeometryNeg = new THREE.BufferGeometry().setFromPoints([origin, xAxisEndNeg]);
     const xAxisLineNeg = new THREE.Line(xAxisGeometryNeg, axesMaterial);
     scene.add(xAxisLineNeg);
-    
+
     // Y axis
     const yAxisEnd = origin.clone().add(new THREE.Vector3(0, length, 0));
     const yAxisGeometry = new THREE.BufferGeometry().setFromPoints([origin, yAxisEnd]);
     const yAxisLine = new THREE.Line(yAxisGeometry, axesMaterial);
     scene.add(yAxisLine);
-    
+
     // Y' axis (negative)
     const yAxisEndNeg = origin.clone().add(new THREE.Vector3(0, -length, 0));
     const yAxisGeometryNeg = new THREE.BufferGeometry().setFromPoints([origin, yAxisEndNeg]);
     const yAxisLineNeg = new THREE.Line(yAxisGeometryNeg, axesMaterial);
     scene.add(yAxisLineNeg);
-    
+
     // Create permanent measurement line (red)
     const lineMaterial = new THREE.LineBasicMaterial({ color: 0xff0000, linewidth: 2 });
     const lineGeometry = new THREE.BufferGeometry().setFromPoints([origin, end]);
     const line = new THREE.Line(lineGeometry, lineMaterial);
     scene.add(line);
-    
+
     // Create permanent end marker (red)
     const endGeometry = new THREE.SphereGeometry(0.2, 8, 8);
     const endMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
     const endMarker = new THREE.Mesh(endGeometry, endMaterial);
     endMarker.position.copy(end);
     scene.add(endMarker);
-    
+
     // Store references for deletion
     permanentLines.push({
         measurementIndex: measurementIndex,
@@ -526,13 +531,14 @@ function clearSelection() {
 function calculateDistance(mode) {
     const distance = selectedPoints[0].distanceTo(selectedPoints[1]);
     const convertedDistance = convertUnits(distance);
-    
+
     // Determine label based on mode
     let label;
     if (mode === 'b1') label = 'B1';
     else if (mode === 'b2') label = 'B2';
-    else if (mode === 'cheight') label = 'C';
-    
+    else if (mode === 'c1') label = 'C1';
+    else if (mode === 'c2') label = 'C2';
+
     const measurementIndex = measurements.length;
 
     measurements.push({
@@ -541,21 +547,22 @@ function calculateDistance(mode) {
         value: convertedDistance.toFixed(2),
         unit: currentUnit,
         rawValue: distance,
-        points: selectedPoints.map(p => ({ 
-            x: p.x.toFixed(2), 
-            y: p.y.toFixed(2), 
-            z: p.z.toFixed(2) 
+        points: selectedPoints.map(p => ({
+            x: p.x.toFixed(2),
+            y: p.y.toFixed(2),
+            z: p.z.toFixed(2)
         }))
     });
-    
+
     // Create permanent visual elements for distance measurement
     createPermanentDistanceVisuals(selectedPoints[0], selectedPoints[1], measurementIndex);
-    
+
     // Disable the button after measurement
     if (mode === 'b1') b1Btn.disabled = true;
     else if (mode === 'b2') b2Btn.disabled = true;
-    else if (mode === 'cheight') cHeightBtn.disabled = true;
-    
+    else if (mode === 'c1') c1Btn.disabled = true;
+    else if (mode === 'c2') c2Btn.disabled = true;
+
     updateMeasurementsDisplay();
 }
 
@@ -566,19 +573,19 @@ function createPermanentDistanceVisuals(point1, point2, measurementIndex) {
     const marker1 = new THREE.Mesh(marker1Geometry, marker1Material);
     marker1.position.copy(point1);
     scene.add(marker1);
-    
+
     const marker2Geometry = new THREE.SphereGeometry(0.2, 8, 8);
     const marker2Material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
     const marker2 = new THREE.Mesh(marker2Geometry, marker2Material);
     marker2.position.copy(point2);
     scene.add(marker2);
-    
+
     // Create permanent line
     const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffff00, linewidth: 2 });
     const lineGeometry = new THREE.BufferGeometry().setFromPoints([point1, point2]);
     const line = new THREE.Line(lineGeometry, lineMaterial);
     scene.add(line);
-    
+
     // Store references for deletion
     permanentLines.push({
         measurementIndex: measurementIndex,
@@ -588,7 +595,7 @@ function createPermanentDistanceVisuals(point1, point2, measurementIndex) {
 
 function convertUnits(value) {
     // Assuming the model units are in mm
-    switch(currentUnit) {
+    switch (currentUnit) {
         case 'mm': return value;
         case 'cm': return value / 10;
         case 'm': return value / 1000;
@@ -641,19 +648,19 @@ const distanceControls = document.getElementById('distanceControls');
 function calculateTapers() {
     const angles = measurements.filter(m => m.type === 'angle');
     const distances = measurements.filter(m => m.type === 'distance');
-    
+
     let results = '';
     let allSuccess = true;
-    
+
     // Taper 1: Average of Angle 1, Angle 2, Angle 3, and Angle 4
     if (angles.length >= 4) {
         const angle1 = parseFloat(angles.find(a => a.label === 'Angle 1')?.value || 0);
         const angle2 = parseFloat(angles.find(a => a.label === 'Angle 2')?.value || 0);
         const angle3 = parseFloat(angles.find(a => a.label === 'Angle 3')?.value || 0);
         const angle4 = parseFloat(angles.find(a => a.label === 'Angle 4')?.value || 0);
-        
+
         calculatedTapers.taper1 = (angle1 + angle2 + angle3 + angle4) / 4;
-        
+
         results += `
             <div class="taper-result">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -679,24 +686,26 @@ function calculateTapers() {
             </div>
         `;
     }
-    
-    // Taper 2 & 3: Calculation based on B1, B2, and C
-    if (distances.length >= 3) {
+
+    // Taper 2 & 3: Calculation based on B1, B2, and C (Average of C1 and C2)
+    if (distances.length >= 4) {
         const b1 = parseFloat(distances.find(d => d.label === 'B1')?.value || 0);
         const b2 = parseFloat(distances.find(d => d.label === 'B2')?.value || 0);
-        const c = parseFloat(distances.find(d => d.label === 'C')?.value || 0);
-        
-        if (b1 && b2 && c) {
+        const c1 = parseFloat(distances.find(d => d.label === 'C1')?.value || 0);
+        const c2 = parseFloat(distances.find(d => d.label === 'C2')?.value || 0);
+
+        if (b1 && b2 && c1 && c2) {
+            const c = (c1 + c2) / 2;
             calculatedTapers.height = c;
-            
+
             const a = (b1 - b2) / 2;
             const ratio = a / c;
-            
+
             // Taper 2
             if (Math.abs(ratio) <= 1) {
                 const taper2Radians = Math.asin(ratio);
                 calculatedTapers.taper2 = Math.abs(taper2Radians * (180 / Math.PI));
-                
+
                 results += `
                     <div class="taper-result">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -704,6 +713,7 @@ function calculateTapers() {
                             <span style="font-size: 28px; font-weight: 700; color: #10b981;">${calculatedTapers.taper2.toFixed(2)}°</span>
                         </div>
                         <div style="font-size: 12px; color: #6b7280;">
+                            C = (C1 + C2) / 2 = ${c.toFixed(2)}<br>
                             a = (B1 - B2) / 2 = ${a.toFixed(2)}<br>
                             T2 = sin⁻¹(${a.toFixed(2)} / C) = ${calculatedTapers.taper2.toFixed(2)}°
                         </div>
@@ -723,14 +733,14 @@ function calculateTapers() {
                     </div>
                 `;
             }
-            
+
             // Taper 3
             const b2Rounded = Math.round(b2);
             const cRounded = Math.round(c);
-            
+
             if (taper3Table[cRounded] && taper3Table[cRounded][b2Rounded]) {
                 calculatedTapers.taper3 = taper3Table[cRounded][b2Rounded];
-                
+
                 results += `
                     <div class="taper-result">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
@@ -773,14 +783,14 @@ function calculateTapers() {
             <div class="taper-result error">
                 <div style="font-weight: 700; color: #ef4444; margin-bottom: 8px;">TAPER 2 & 3</div>
                 <div style="font-size: 12px; color: #ef4444;">
-                    Please measure B1, B2, and C (currently have ${distances.length})
+                    Please measure B1, B2, C1, and C2 (currently have ${distances.length})
                 </div>
             </div>
         `;
     }
-    
+
     document.getElementById('taperResults').innerHTML = results;
-    
+
     // Show proceed to analysis button if all calculations successful
     if (allSuccess && calculatedTapers.taper1 !== null && calculatedTapers.taper2 !== null && calculatedTapers.taper3 !== null) {
         document.getElementById('taperResults').innerHTML += `
@@ -794,11 +804,11 @@ function calculateTapers() {
 function backToStep1() {
     currentStep = 1;
     updateStepIndicators();
-    
+
     // Show 3D canvas
     canvasContainer.classList.remove('hidden');
     sidebar.classList.remove('full-width');
-    
+
     // Restore measurements view
     updateMeasurementsDisplay();
 }
@@ -806,7 +816,7 @@ function backToStep1() {
 function proceedToStep3() {
     currentStep = 3;
     updateStepIndicators();
-    
+
     showAnalysisResults();
 }
 
@@ -898,13 +908,13 @@ function updateMeasurementsDisplay() {
         clearBtn.disabled = true;
     } else {
         let html = '<div class="sidebar-section"><h3 class="sidebar-section-title">📏 Current Measurements</h3>';
-        
+
         html += measurements.map((m, i) => {
             let displayValue = `${m.value} ${m.unit}`;
             if (m.type === 'angle' && m.rawAngle) {
                 displayValue += ` <span style="font-size: 11px; color: #9ca3af;">(${m.rawAngle}° raw)</span>`;
             }
-            
+
             return `
             <div class="measurement">
                 <div class="measurement-header">
@@ -923,14 +933,14 @@ function updateMeasurementsDisplay() {
             </div>
         `;
         }).join('');
-        
+
         html += '</div>';
-        
+
         // Check if ready for taper calculation
         const angles = measurements.filter(m => m.type === 'angle');
         const distances = measurements.filter(m => m.type === 'distance');
-        
-        if (angles.length === 4 && distances.length === 3) {
+
+        if (angles.length === 4 && distances.length === 4) {
             // All measurements complete - move to step 2
             html += `
                 <div class="workflow-section">
@@ -950,15 +960,15 @@ function updateMeasurementsDisplay() {
                             ${angles.length === 4 ? '✅' : '⏳'}
                         </div>
                         <div>
-                            <strong style="color: #667eea;">Distances:</strong> ${distances.length}/3 
-                            ${distances.length === 3 ? '✅' : '⏳'}
+                            <strong style="color: #667eea;">Distances:</strong> ${distances.length}/4 
+                            ${distances.length === 4 ? '✅' : '⏳'}
                         </div>
                     </div>
                     <p style="font-size: 13px; color: #6b7280;">Complete all measurements to proceed to analysis.</p>
                 </div>
             `;
         }
-        
+
         measurementsDiv.innerHTML = html;
         clearBtn.disabled = false;
     }
@@ -967,11 +977,11 @@ function updateMeasurementsDisplay() {
 function proceedToStep2() {
     currentStep = 2;
     updateStepIndicators();
-    
+
     // Hide 3D canvas
     canvasContainer.classList.add('hidden');
     sidebar.classList.add('full-width');
-    
+
     // Show taper calculation view
     showTaperCalculation();
 }
@@ -980,7 +990,7 @@ function updateStepIndicators() {
     step1Indicator.classList.remove('active', 'completed');
     step2Indicator.classList.remove('active', 'completed');
     step3Indicator.classList.remove('active', 'completed');
-    
+
     if (currentStep === 1) {
         step1Indicator.classList.add('active');
     } else if (currentStep === 2) {
@@ -996,7 +1006,7 @@ function updateStepIndicators() {
 function showTaperCalculation() {
     const angles = measurements.filter(m => m.type === 'angle');
     const distances = measurements.filter(m => m.type === 'distance');
-    
+
     let html = `
         <div class="workflow-section">
             <h2>🧮 Step 2: Calculate Tapers</h2>
@@ -1013,7 +1023,7 @@ function showTaperCalculation() {
             </button>
         </div>
     `;
-    
+
     measurementsDiv.innerHTML = html;
 }
 
@@ -1029,17 +1039,17 @@ function deleteMeasurement(index) {
     visualsToRemove.forEach(visual => {
         visual.elements.forEach(element => scene.remove(element));
     });
-    
+
     // Remove from permanentLines array
     permanentLines = permanentLines.filter(pl => pl.measurementIndex !== index);
-    
+
     // Update indices for remaining measurements
     permanentLines.forEach(pl => {
         if (pl.measurementIndex > index) {
             pl.measurementIndex--;
         }
     });
-    
+
     // Remove measurement
     measurements.splice(index, 1);
     updateMeasurementsDisplay();
@@ -1048,17 +1058,17 @@ function deleteMeasurement(index) {
 function clearMeasurements() {
     measurements = [];
     measurementCounter = { angle: 1, distance: 1 };
-    
+
     // Remove all permanent visual elements
     permanentLines.forEach(visual => {
         visual.elements.forEach(element => scene.remove(element));
     });
     permanentLines = [];
-    
+
     clearSelection();
     clearAngleTools();
     updateMeasurementsDisplay();
-    
+
     // Re-enable all buttons
     angle1Btn.disabled = false;
     angle2Btn.disabled = false;
@@ -1066,7 +1076,8 @@ function clearMeasurements() {
     angle4Btn.disabled = false;
     b1Btn.disabled = false;
     b2Btn.disabled = false;
-    cHeightBtn.disabled = false;
+    c1Btn.disabled = false;
+    c2Btn.disabled = false;
 }
 
 function handleMouseDown(e) {
@@ -1091,7 +1102,7 @@ function handleMouseMove(e) {
             model.rotation.y = rotation.y;
             model.rotation.x = rotation.x;
         }
-    } 
+    }
     else if (e.buttons === 2) {
         // Right mouse button = PAN
         model.position.x += deltaX * 0.1;
@@ -1103,9 +1114,9 @@ function handleMouseMove(e) {
 
 function handleMouseUp() {
     isDragging = false;
-    
-    if ((measurementMode === 'angle1' || measurementMode === 'angle2' || 
-         measurementMode === 'angle3' || measurementMode === 'angle4') && angleOrigin) {
+
+    if ((measurementMode === 'angle1' || measurementMode === 'angle2' ||
+        measurementMode === 'angle3' || measurementMode === 'angle4') && angleOrigin) {
         canvas.style.cursor = 'crosshair';
     } else if (!measurementMode) {
         canvas.style.cursor = 'grab';
@@ -1114,26 +1125,26 @@ function handleMouseUp() {
 
 function deleteMeasurement(index) {
     const measurement = measurements[index];
-    
+
     // Remove visual elements associated with this measurement
     const visualsToRemove = permanentLines.filter(pl => pl.measurementIndex === index);
     visualsToRemove.forEach(visual => {
         visual.elements.forEach(element => scene.remove(element));
     });
-    
+
     // Remove from permanentLines array
     permanentLines = permanentLines.filter(pl => pl.measurementIndex !== index);
-    
+
     // Update indices for remaining measurements
     permanentLines.forEach(pl => {
         if (pl.measurementIndex > index) {
             pl.measurementIndex--;
         }
     });
-    
+
     // Remove measurement
     measurements.splice(index, 1);
-    
+
     // Re-enable button if deleting specific measurement
     if (measurement.label === 'Angle 1') angle1Btn.disabled = false;
     else if (measurement.label === 'Angle 2') angle2Btn.disabled = false;
@@ -1141,8 +1152,9 @@ function deleteMeasurement(index) {
     else if (measurement.label === 'Angle 4') angle4Btn.disabled = false;
     else if (measurement.label === 'B1') b1Btn.disabled = false;
     else if (measurement.label === 'B2') b2Btn.disabled = false;
-    else if (measurement.label === 'C') cHeightBtn.disabled = false;
-    
+    else if (measurement.label === 'C1') c1Btn.disabled = false;
+    else if (measurement.label === 'C2') c2Btn.disabled = false;
+
     updateMeasurementsDisplay();
 }
 
@@ -1162,7 +1174,7 @@ function handleResize() {
 function toggleCanvasView() {
     canvasContainer.classList.toggle('minimized');
     const isMinimized = canvasContainer.classList.contains('minimized');
-    
+
     // Update icon
     if (isMinimized) {
         toggleIcon.innerHTML = '<path d="M6 9l6 6 6-6"/>';
@@ -1217,13 +1229,13 @@ function handleTouchMove(e) {
         // Rotation
         const deltaX = e.touches[0].clientX - touchStartX;
         const deltaY = e.touches[0].clientY - touchStartY;
-        
+
         rotation.y += deltaX * 0.01;
         rotation.x += deltaY * 0.01;
-        
+
         model.rotation.y = rotation.y;
         model.rotation.x = rotation.x;
-        
+
         touchStartX = e.touches[0].clientX;
         touchStartY = e.touches[0].clientY;
     } else if (e.touches.length === 2) {
@@ -1231,11 +1243,11 @@ function handleTouchMove(e) {
         const dx = e.touches[0].clientX - e.touches[1].clientX;
         const dy = e.touches[0].clientY - e.touches[1].clientY;
         const distance = Math.sqrt(dx * dx + dy * dy);
-        
+
         const delta = (touchStartDistance - distance) * 0.5;
         camera.position.z += delta;
         camera.position.z = Math.max(10, Math.min(500, camera.position.z));
-        
+
         touchStartDistance = distance;
     }
 }
@@ -1289,7 +1301,7 @@ function showAngleInfo() {
             </div>
         </div>
     `;
-    
+
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
@@ -1337,7 +1349,7 @@ function showDistanceInfo() {
             </div>
         </div>
     `;
-    
+
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
@@ -1370,42 +1382,39 @@ function showInstructionInfo() {
                     <div class="modal-section">
                         <h3>📏 3. Measure Width (Buccolingual)</h3>
                         <ul>
-                            <li>Select the <strong>Measure Width</strong> tool.</li>
-                            <li>Click two points across the tip (Point 1 → Point 2).</li>
-                            <li>Click two points across the base (Point 1 → Point 2).</li>
-                            <li>The software displays both measurements automatically.</li>
+                            <li>Select <strong>B1 Width</strong> or <strong>B2 Width</strong>.</li>
+                            <li><strong>B1:</strong> Measure the widest point at the gingival margin.</li>
+                            <li><strong>B2:</strong> Measure the narrowest point at the occlusal surface.</li>
                         </ul>
                     </div>
 
                     <div class="modal-section">
                         <h3>📐 4. Measure Height (Axial Wall)</h3>
                         <ul>
-                            <li>Select the <strong>Measure Height</strong> tool.</li>
-                            <li>Click at the finish line (Point 1).</li>
-                            <li>Click at the occlusal end of the axial wall (Point 2).</li>
-                            <li>Repeat on the opposite side.</li>
-                            <li>The app shows the average height instantly.</li>
+                            <li>Select <strong>C1 Height</strong> or <strong>C2 Height</strong>.</li>
+                            <li><strong>C1:</strong> Measure height on the buccal surface.</li>
+                            <li><strong>C2:</strong> Measure height on the lingual surface.</li>
+                            <li>The app uses the average of C1 and C2 for calculations.</li>
                         </ul>
                     </div>
 
                     <div class="modal-section">
                         <h3>📐 5. Measure Taper Angles</h3>
                         <ul>
-                            <li>Select <strong>Measure Taper</strong>.</li>
-                            <li>Align the tooth to view mesial & distal axial walls.</li>
-                            <li>Click one point on the mesial wall.</li>
-                            <li>Click one point on the distal wall.</li>
-                            <li>The app calculates the taper angle automatically.</li>
+                            <li>Select specific Angle tool (Angle 1 - Angle 4).</li>
+                            <li>Align the tooth to view appropriate walls.</li>
+                            <li>Click center point, then click margin point.</li>
+                            <li>Measure all 4 angles for complete analysis.</li>
                         </ul>
                     </div>
 
                     <div class="modal-section">
                         <h3>📊 6. Angle Calculations</h3>
-                        <p>Click <strong>Calculate Taper</strong> to display:</p>
+                        <p>Click <strong>Calculate Tapers</strong> to display:</p>
                         <ul>
-                            <li>Taper 1 angle</li>
-                            <li>Taper 2 angle</li>
-                            <li>Taper 3 angle</li>
+                            <li>Taper 1 (Average of 4 angles)</li>
+                            <li>Taper 2 (calculated from B1, B2, C average)</li>
+                            <li>Taper 3 (from lookup table)</li>
                         </ul>
                     </div>
 
