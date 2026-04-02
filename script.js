@@ -141,6 +141,10 @@ function loadSTL(arrayBuffer) {
 
     const geometry = parseSTL(arrayBuffer);
     geometry.computeVertexNormals();
+    geometry.computeBoundingBox();
+    const center = new THREE.Vector3();
+    geometry.boundingBox.getCenter(center);
+    geometry.translate(-center.x, -center.y, -center.z);
 
     const material = new THREE.MeshPhongMaterial({
         color: 0x58BDDC,
@@ -1096,11 +1100,14 @@ function handleMouseMove(e) {
     if (e.buttons === 1) {
         // Left mouse button = ROTATION
         if (!measurementMode) {
-            rotation.y += deltaX * 0.005;
-            rotation.x += deltaY * 0.005;
-
-            model.rotation.y = rotation.y;
-            model.rotation.x = rotation.x;
+            const rx = deltaY * 0.005;
+            const ry = deltaX * 0.005;
+            
+            const qx = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), rx);
+            const qy = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), ry);
+            
+            qy.multiply(qx);
+            model.quaternion.premultiply(qy);
         }
     }
     else if (e.buttons === 2) {
@@ -1230,11 +1237,14 @@ function handleTouchMove(e) {
         const deltaX = e.touches[0].clientX - touchStartX;
         const deltaY = e.touches[0].clientY - touchStartY;
 
-        rotation.y += deltaX * 0.01;
-        rotation.x += deltaY * 0.01;
+        const rx = deltaY * 0.01;
+        const ry = deltaX * 0.01;
 
-        model.rotation.y = rotation.y;
-        model.rotation.x = rotation.x;
+        const qx = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), rx);
+        const qy = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), ry);
+        
+        qy.multiply(qx);
+        model.quaternion.premultiply(qy);
 
         touchStartX = e.touches[0].clientX;
         touchStartY = e.touches[0].clientY;
